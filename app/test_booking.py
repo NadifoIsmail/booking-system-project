@@ -1,117 +1,126 @@
 import pytest
-from sqlalchemy import create_engine
+from models import engine, Base, Users, Rooms, Bookings
 from sqlalchemy.orm import sessionmaker
-from models import Base, Users, Rooms, Bookings
 from datetime import datetime
 
-# Test setup
-def setup_module(module):
-    global engine, Session, session
-    engine = create_engine("sqlite:///:memory:")  # In-memory database for testing
-    Base.metadata.create_all(engine)
-    Session = sessionmaker(bind=engine)
-    session = Session()
+# Setup session
+Session = sessionmaker(bind=engine)
+session = Session()
 
-def teardown_module(module):
-    session.close()
+# Fixtures for setting up and tearing down the database
+@pytest.fixture(autouse=True)
+def clean_database():
+    # Drop and recreate tables before each test
     Base.metadata.drop_all(engine)
+    Base.metadata.create_all(engine)
+    yield
+    session.rollback()
 
 @pytest.fixture
-def user():
-    user = Users(name="Test User", email="test@example.com", password="test123")
+def sample_user():
+    user = Users(name="Test User", email="testuser@example.com", password="password123")
     session.add(user)
     session.commit()
     return user
 
 @pytest.fixture
-def room():
+def sample_room():
     room = Rooms(type="single", price=100.0, availability=True)
     session.add(room)
     session.commit()
     return room
 
 @pytest.fixture
-def booking(user, room):
+def sample_booking(sample_user, sample_room):
     booking = Bookings(
-        user_id=user.id,
-        room_id=room.id,
-        check_in=datetime(2024, 12, 25),
-        check_out=datetime(2024, 12, 30)
+        user_id=sample_user.id,
+        room_id=sample_room.id,
+        check_in=datetime(2024, 12, 20, 0, 0),  
+        check_out=datetime(2024, 12, 25, 0, 0)
     )
     session.add(booking)
     session.commit()
     return booking
 
-# User management tests
+# Tests for User Management
 def test_add_user():
-    new_user = Users(name="Jane Doe", email="jane@example.com", password="securepass")
-    session.add(new_user)
+    user = Users(name="New User", email="newuser@example.com", password="newpassword")
+    session.add(user)
     session.commit()
-    assert new_user in session.query(Users).all()
+    assert user in session.query(Users).all()
 
-def test_view_users(user):
+def test_view_users(sample_user):
     users = session.query(Users).all()
     assert len(users) == 1
     assert users[0].name == "Test User"
 
-def test_update_user(user):
-    user.name = "Updated User"
+def test_update_user(sample_user):
+    sample_user.name = "Updated User"
     session.commit()
-    updated_user = session.query(Users).filter_by(id=user.id).first()
+    updated_user = session.query(Users).filter_by(id=sample_user.id).first()
     assert updated_user.name == "Updated User"
 
-def test_delete_user(user):
-    session.delete(user)
+def test_delete_user(sample_user):
+    session.delete(sample_user)
     session.commit()
-    assert session.query(Users).filter_by(id=user.id).first() is None
+    users = session.query(Users).all()
+    assert len(users) == 0
 
-# Room management tests
+# Tests for Room Management
 def test_add_room():
-    new_room = Rooms(type="double", price=150.0, availability=True)
-    session.add(new_room)
+    room = Rooms(type="double", price=150.0, availability=True)
+    session.add(room)
     session.commit()
-    assert new_room in session.query(Rooms).all()
+    assert room in session.query(Rooms).all()
 
-def test_view_rooms(room):
+def test_view_rooms(sample_room):
     rooms = session.query(Rooms).all()
     assert len(rooms) == 1
     assert rooms[0].type == "single"
 
-def test_update_room(room):
-    room.price = 120.0
+def test_update_room(sample_room):
+    sample_room.price = 120.0
     session.commit()
-    updated_room = session.query(Rooms).filter_by(id=room.id).first()
+    updated_room = session.query(Rooms).filter_by(id=sample_room.id).first()
     assert updated_room.price == 120.0
 
-def test_delete_room(room):
-    session.delete(room)
+def test_delete_room(sample_room):
+    session.delete(sample_room)
     session.commit()
-    assert session.query(Rooms).filter_by(id=room.id).first() is None
+    rooms = session.query(Rooms).all()
+    assert len(rooms) == 0
 
-# Booking management tests
-def test_add_booking(user, room):
-    new_booking = Bookings(
-        user_id=user.id,
-        room_id=room.id,
+# Tests for Booking Management
+def test_add_booking(sample_user, sample_room):
+    booking = Bookings(
+        user_id=sample_user.id,
+        room_id=sample_room.id,
         check_in=datetime(2024, 12, 20),
         check_out=datetime(2024, 12, 25)
     )
-    session.add(new_booking)
+    session.add(booking)
     session.commit()
-    assert new_booking in session.query(Bookings).all()
+    assert booking in session.query(Bookings).all()
 
-def test_view_bookings(booking):
+from datetime import datetime
+
+def test_view_bookings(sample_booking):
     bookings = session.query(Bookings).all()
     assert len(bookings) == 1
-    assert bookings[0].user_id == booking.user_id
+    
+    assert bookings[0].check_in == datetime(2024, 12, 20, 0, 0)
+    assert bookings[0].check_out == datetime(2024, 12, 25, 0, 0)
 
-def test_update_booking(booking):
-    booking.check_out = datetime(2024, 12, 31)
+def test_update_booking(sample_booking):
+    sample_booking.check_out = datetime(2024, 12, 30, 0, 0)  
     session.commit()
-    updated_booking = session.query(Bookings).filter_by(id=booking.id).first()
-    assert updated_booking.check_out == datetime(2024, 12, 31)
+    updated_booking = session.query(Bookings).filter_by(id=sample_booking.id).first()
+    assert updated_booking.check_out == datetime(2024, 12, 30, 0, 0)
 
-def test_delete_booking(booking):
-    session.delete(booking)
+
+
+def test_delete_booking(sample_booking):
+    session.delete(sample_booking)
     session.commit()
-    assert session.query(Bookings).filter_by(id=booking.id).first() is None
+    bookings = session.query(Bookings).all()
+    assert len(bookings) == 0
