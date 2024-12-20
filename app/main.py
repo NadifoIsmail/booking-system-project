@@ -138,8 +138,8 @@ def update_booking():
     check_out_str = input("Enter new Check-out Date (YYYY-MM-DD): ")
 
     try:
-        check_in_date = datetime(check_in_str, '%Y-%m-%d').date()
-        check_out_date = datetime(check_out_str, '%Y-%m-%d').date()
+        check_in_date = datetime.strptime(check_in_str, '%Y-%m-%d').date()
+        check_out_date = datetime.strptime(check_out_str, '%Y-%m-%d').date()
     except ValueError:
         print("Invalid date format. Please use YYYY-MM-DD.")
         return
@@ -172,7 +172,7 @@ def delete_booking():
 def main():
     while True:
         os.system("clear")
-        print("=== Hotel Booking System ===")
+        print("=== Hotel Booking System === ")
         print("1. User Management")
         print("2. Room Management")
         print("3. Booking Management")
