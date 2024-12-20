@@ -6,6 +6,8 @@
 * Room Management (Admin): Administrators can add, update, and remove room details.
 * Booking Management: Users can book rooms for specific dates, and admins can manage all bookings.
 * Database Integration: Uses SQLAlchemy to store and manage data efficiently.
+## Slide presentation 
+* Here is the link to my presentation slide [https://docs.google.com/presentation/d/1VVQOmOr-BGXV_Q_gt-wKe5LGVcaMtpDnyWEaU84R2T8/edit?usp=sharing]
 ## Setup/Installation Requirements
 * Download a file in the code section to the desired folder
 * Extract the files
@@ -16,5 +18,5 @@ Sqlalchemy,python and cli
 ## Support and contact details
 email :: nadifo.ismail@student.moringaschool.com
 ### License
-*LIcenced under the []*
+*LIcenced under the [https://github.com/NadifoIsmail/booking-system-project/blob/master/LICENSE.md]*
 Copyright (c) 2024 **Nadifo Ismail**
