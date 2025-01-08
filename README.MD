@@ -10,6 +10,8 @@
 * Here is the link to my presentation slide [https://docs.google.com/presentation/d/1VVQOmOr-BGXV_Q_gt-wKe5LGVcaMtpDnyWEaU84R2T8/edit?usp=sharing]
 ## Presentation Link
 * Here is the link to my presentation[https://app.screencastify.com/v2/manage/videos/fQG30fYQDSxEHB7CasSx]
+*  Here is the link to my presentation using google drive
+[https://drive.google.com/file/d/1PLPuKzqdrutFOGtzm_ljrcvjCa-MxM9m/view]
 ## Setup/Installation Requirements
 * Download a file in the code section to the desired folder
 * Extract the files
